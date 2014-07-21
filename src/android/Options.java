@@ -247,13 +247,17 @@ public class Options {
      * @return
      *      The notification color for LED
      */
-   public int getColor () {
-        String hexColor = options.optString("led", "000000");
-        int aRGB        = Integer.parseInt(hexColor,16);
+   public Integer getColor () {
+       if (! options.has("led") || options.isNull("led")) {
+           return null;
+       }
 
-        aRGB += 0xFF000000;
+       String hexColor = options.optString("led");
 
-        return aRGB;
+       int aRGB = Integer.parseInt(hexColor, 16);
+       aRGB += 0xFF000000;
+
+       return aRGB;
     }
 
     /**

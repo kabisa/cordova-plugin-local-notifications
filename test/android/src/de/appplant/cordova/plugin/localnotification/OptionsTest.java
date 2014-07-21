@@ -32,6 +32,23 @@ public class OptionsTest extends AndroidTestCase {
         }
     }
 
+    public void testNoLedSpecified() {
+        Options options = parseOptions("{ }");
+
+        assertNull(options.getColor());
+    }
+
+    public void testLedSpecified() {
+        Options options = parseOptions("{ \"led\": \"A0FF05\" }");
+        assertEquals(-6226171, (int)options.getColor());
+    }
+
+    public void testNoLedNull() {
+        Options options = parseOptions("{ \"led\": null }");
+
+        assertNull(options.getColor());
+    }
+
     private Options parseOptions(String json) {
         try {
             JSONObject jsonObject = new JSONObject(json);

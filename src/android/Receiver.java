@@ -116,7 +116,8 @@ public class Receiver extends BroadcastReceiver {
      */
     @SuppressLint("NewApi")
     private Builder buildNotification () {
-        Uri sound = options.getSound();
+        Uri sound     = options.getSound();
+        Integer color = options.getColor();
 
         Builder notification = new NotificationCompat.Builder(context)
             .setContentTitle(options.getTitle())
@@ -127,8 +128,11 @@ public class Receiver extends BroadcastReceiver {
             .setLargeIcon(options.getIcon())
             .setAutoCancel(options.getAutoCancel())
             .setOngoing(options.getOngoing())
-            .setLights(options.getColor(), 500, 500)
             .setVibrate(options.getVibrationPattern());
+
+        if(color != null) {
+            notification.setLights(color, 500, 500);
+        }
 
         if (sound != null) {
             notification.setSound(sound);
