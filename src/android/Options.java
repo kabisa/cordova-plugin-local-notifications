@@ -30,6 +30,7 @@ import java.util.Date;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -253,6 +254,30 @@ public class Options {
         aRGB += 0xFF000000;
 
         return aRGB;
+    }
+
+    /**
+     * @return the vibration pattern to use, or { 0, 0 } if no pattern was specified,
+     * in which case the notification will not cause a vibration.
+     */
+    public long[] getVibrationPattern() {
+        JSONArray patternOption = options.optJSONArray("vibrationPattern");
+
+        if(patternOption == null) {
+            return new long[] { 0, 0 };
+        }
+
+        long[] pattern = new long[patternOption.length()];
+
+        try {
+            for (int i = 0; i < patternOption.length(); i++) {
+                pattern[i] = patternOption.getLong(i);
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        return pattern;
     }
 
     /**
