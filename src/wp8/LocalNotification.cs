@@ -107,7 +107,7 @@ namespace Cordova.Extension.Commands
                     WideBackContent      = "",
                     SmallBackgroundImage = new Uri("appdata:Background.png"),
                     BackgroundImage      = new Uri("appdata:Background.png"),
-                    WideBackgroundImage  = new Uri("/Assets/Tiles/FlipCycleTileLarge.png", UriKind.Relative),
+                    WideBackgroundImage  = new Uri("appdata:www/assets/WideTile.png"),
                 };
 
                 // Update the Application Tile
