@@ -120,6 +120,7 @@ public class Receiver extends BroadcastReceiver {
         Integer color = options.getColor();
 
         Builder notification = new NotificationCompat.Builder(context)
+            .setDefaults(0) // Do not inherit any defaults
             .setContentTitle(options.getTitle())
             .setContentText(options.getMessage())
             .setNumber(options.getBadge())
