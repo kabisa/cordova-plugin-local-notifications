@@ -20,6 +20,7 @@
  */
 
 #import "APPLocalNotification.h"
+#import <Cordova/CDVAvailability.h>
 
 @interface APPLocalNotification ()
 
@@ -67,11 +68,14 @@
         NSArray* arguments = [command arguments];
         NSMutableDictionary* properties = [arguments objectAtIndex:0];
 
+        UILocalNotification* notification;
         NSString* id = [properties objectForKey:@"id"];
 
         if ([self isNotificationScheduledWithId:id]) {
-            UILocalNotification* notification = [self notificationWithId:id];
+            notification = [self notificationWithId:id];
+        }
 
+        if (notification) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.3 * NSEC_PER_SEC),
                            dispatch_get_main_queue(), ^{
                                [self cancelNotification:notification fireEvent:NO];
@@ -181,23 +185,20 @@
 }
 
 /**
- * Checks wether a notification with an ID was triggered.
+ * Informs if the app has the permission to show
+ * badges and local notifications.
  *
- * @param {NSString} id
- *      The ID of the notification
  * @param callback
- *      The callback function to be called with the result
+ *      The function to be exec as the callback
  */
-- (void) isTriggered:(CDVInvokedUrlCommand*)command
+- (void) hasPermission:(CDVInvokedUrlCommand *)command
 {
     [self.commandDelegate runInBackground:^{
-        NSArray* arguments = [command arguments];
-        NSString* id       = [arguments objectAtIndex:0];
-        bool isTriggered   = [self isNotificationTriggeredWithId:id];
         CDVPluginResult* result;
+        BOOL hasPermission = [self hasPermissionToSheduleNotifications];
 
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                     messageAsBool:isTriggered];
+                                     messageAsBool:hasPermission];
 
         [self.commandDelegate sendPluginResult:result
                                     callbackId:command.callbackId];
@@ -205,40 +206,48 @@
 }
 
 /**
- * Retrieves a list of ids from all currently triggered notifications.
+ * Ask for permission to show badges.
  *
  * @param callback
- *      The callback function to be called with the result
+ *      The function to be exec as the callback
  */
-- (void) getTriggeredIds:(CDVInvokedUrlCommand*)command
+- (void) promptForPermission:(CDVInvokedUrlCommand *)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSArray* notifications = self.scheduledNotifications;
+    if (IsAtLeastiOSVersion(@"8.0")) {
+        UIUserNotificationType types;
+        UIUserNotificationSettings *settings;
 
-        NSMutableArray* scheduledIds = [[NSMutableArray alloc] init];
-        CDVPluginResult* result;
+        types = UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound;
 
-        for (UILocalNotification* notification in notifications)
-        {
-            if (![self isNotificationTriggered:notification]) {
-                continue;
-            }
+        settings = [UIUserNotificationSettings settingsForTypes:types
+                                                     categories:nil];
 
-            NSString* id = [notification.userInfo objectForKey:@"id"];
-
-            [scheduledIds addObject:id];
-        }
-
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:scheduledIds];
-
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+        [self.commandDelegate runInBackground:^{
+            [[UIApplication sharedApplication]
+             registerUserNotificationSettings:settings];
+        }];
+    }
 }
 
-#pragma mark -
-#pragma mark Plugin core methods
+/**
+ * If the app has the permission to show badges.
+ */
+- (BOOL) hasPermissionToSheduleNotifications
+{
+    if (IsAtLeastiOSVersion(@"8.0")) {
+        UIUserNotificationType types;
+        UIUserNotificationSettings *settings;
+
+        settings = [[UIApplication sharedApplication]
+                    currentUserNotificationSettings];
+
+        types = UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound;
+
+        return (settings.types & types);
+    } else {
+        return YES;
+    }
+}
 
 /**
  * Schedules a new local notification and fies the coresponding event.
@@ -572,7 +581,8 @@
 
     for (UILocalNotification* notification in notifications)
     {
-        NSString* notId = [[notification.userInfo objectForKey:@"id"] stringValue];
+        NSString* notId = [[notification.userInfo objectForKey:@"id"]
+                           stringValue];
 
         if ([notId isEqualToString:id]) {
             return notification;

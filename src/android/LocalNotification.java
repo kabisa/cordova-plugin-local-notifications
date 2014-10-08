@@ -124,6 +124,15 @@ public class LocalNotification extends CordovaPlugin {
             getTriggeredIds(command);
         }
 
+        if (action.equalsIgnoreCase("hasPermission")) {
+            hasPermission(callbackContext);
+            return true;
+        }
+
+        if (action.equalsIgnoreCase("promptForPermission")) {
+            return true;
+        }
+
         if (action.equalsIgnoreCase("deviceready")) {
             cordova.getThreadPool().execute( new Runnable() {
                 public void run() {
@@ -312,6 +321,25 @@ public class LocalNotification extends CordovaPlugin {
         }
 
         command.success(scheduledIds);
+    }
+
+    /**
+     * Informs if the app has the permission to show notifications.
+     *
+     * @param callback
+     *      The function to be exec as the callback
+     */
+    private void hasPermission (final CallbackContext callback) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                PluginResult result;
+
+                result = new PluginResult(PluginResult.Status.OK, true);
+
+                callback.sendPluginResult(result);
+            }
+        });
     }
 
     /**

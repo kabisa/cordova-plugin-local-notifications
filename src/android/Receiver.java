@@ -116,6 +116,7 @@ public class Receiver extends BroadcastReceiver {
      */
     @SuppressLint("NewApi")
     private Builder buildNotification () {
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), options.getIcon());
         Uri sound     = options.getSound();
         Integer color = options.getColor();
 
@@ -126,12 +127,12 @@ public class Receiver extends BroadcastReceiver {
             .setNumber(options.getBadge())
             .setTicker(options.getMessage())
             .setSmallIcon(options.getSmallIcon())
-            .setLargeIcon(options.getIcon())
+	    .setLargeIcon(icon)
             .setAutoCancel(options.getAutoCancel())
             .setOngoing(options.getOngoing())
             .setVibrate(options.getVibrationPattern());
 
-        if(color != null) {
+        if (color != null) {
             notification.setLights(color, 500, 500);
         }
 

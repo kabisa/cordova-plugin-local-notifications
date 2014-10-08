@@ -3,13 +3,13 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="de.appplant.cordova.plugin.local-notification"
-        version="0.8.0dev">
+        version="0.7.6">
 
     <name>LocalNotification</name>
 
     <description>The purpose of the plugin is to create an platform independent javascript interface for Cordova based mobile applications to access the specific Notification API on each platform.</description>
     <repo>https://github.com/katzer/cordova-plugin-local-notifications.git</repo>
-    <keywords>notification, local notification, alarm, scheduler, tile, live tiles, ios, android, windows phone 8, wp8</keywords>
+    <keywords>notification, local notification, alarm, scheduler, tile, live tiles, ios, android, windows phone 8, wp8, iOS8</keywords>
     <license>Apache 2.0</license>
 
     <author>Sebastián Katzer</author>
