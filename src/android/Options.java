@@ -164,21 +164,21 @@ public class Options {
     /**
      * Returns the icon's ID
      */
-    public Bitmap getIcon () {
-        String icon = options.optString("icon", "icon");
-        Bitmap bmp = null;
+     public int getIcon () {
+        int icon        = 0;
+        String iconName = options.optString("icon", "icon");
 
-        if (icon.startsWith("http")) {
-            bmp = getIconFromURL(icon);
-        } else if (icon.startsWith("file://")) {
-            bmp = getIconFromURI(icon);
+        icon = getIconValue(packageName, iconName);
+
+        if (icon == 0) {
+            icon = getIconValue("android", iconName);
         }
 
-        if (bmp == null) {
-            bmp = getIconFromRes(icon);
+        if (icon == 0) {
+            icon = android.R.drawable.ic_menu_info_details;
         }
 
-        return bmp;
+        return options.optInt("icon", icon);
     }
 
     /**
@@ -300,92 +300,5 @@ public class Options {
         } catch (Exception e) {}
 
         return icon;
-    }
-
-    /**
-     * Converts an resource to Bitmap.
-     *
-     * @param icon
-     *      The resource name
-     * @return
-     *      The corresponding bitmap
-     */
-    private Bitmap getIconFromRes (String icon) {
-        Resources res = LocalNotification.context.getResources();
-        int iconId = 0;
-
-        iconId = getIconValue(packageName, icon);
-
-        if (iconId == 0) {
-            iconId = getIconValue("android", icon);
-        }
-
-        if (iconId == 0) {
-            iconId = android.R.drawable.ic_menu_info_details;
-        }
-
-        Bitmap bmp = BitmapFactory.decodeResource(res, iconId);
-
-        return bmp;
-    }
-
-    /**
-     * Converts an Image URL to Bitmap.
-     *
-     * @param src
-     *      The external image URL
-     * @return
-     *      The corresponding bitmap
-     */
-    private Bitmap getIconFromURL (String src) {
-        Bitmap bmp = null;
-        ThreadPolicy origMode = StrictMode.getThreadPolicy();
-
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            StrictMode.ThreadPolicy policy =
-                    new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-            StrictMode.setThreadPolicy(policy);
-
-            connection.setDoInput(true);
-            connection.connect();
-
-            InputStream input = connection.getInputStream();
-
-            bmp = BitmapFactory.decodeStream(input);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        StrictMode.setThreadPolicy(origMode);
-
-        return bmp;
-    }
-
-    /**
-     * Converts an Image URI to Bitmap.
-     *
-     * @param src
-     *      The internal image URI
-     * @return
-     *      The corresponding bitmap
-     */
-    private Bitmap getIconFromURI (String src) {
-        AssetManager assets = LocalNotification.context.getAssets();
-        Bitmap bmp = null;
-
-        try {
-            String path = src.replace("file:/", "www");
-            InputStream input = assets.open(path);
-
-            bmp = BitmapFactory.decodeStream(input);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bmp;
     }
 }

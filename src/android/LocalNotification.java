@@ -125,7 +125,7 @@ public class LocalNotification extends CordovaPlugin {
         }
 
         if (action.equalsIgnoreCase("hasPermission")) {
-            hasPermission(callbackContext);
+            hasPermission(command);
             return true;
         }
 
